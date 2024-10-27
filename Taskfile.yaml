@@ -1,0 +1,11 @@
+version: '3'
+
+tasks:
+  sync:run:
+    dir: ./app
+    cmds:
+      - go run ./cmd/sync {{.CLI_ARGS}}
+  sync:build:
+    dir: ./app
+    cmds:
+      - go build -o ./bin/sync ./cmd/sync

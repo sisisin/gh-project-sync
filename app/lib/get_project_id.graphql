@@ -1,0 +1,15 @@
+query GetProjectId($dryRun: Boolean! = false, $org: String!, $projectNumber: Int!) {
+  rateLimit(dryRun: $dryRun) {
+    cost
+    limit
+    nodeCount
+    remaining
+    resetAt
+    used
+  }
+  organization(login: $org) {
+    projectV2(number: $projectNumber) {
+      id
+    }
+  }
+}
