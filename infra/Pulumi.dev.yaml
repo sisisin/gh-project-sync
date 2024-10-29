@@ -1,0 +1,4 @@
+config:
+  gcp:project: knowledgework-simenyan-sandbox
+  gcp:region: us-west1
+  projectNumber: 31671566034

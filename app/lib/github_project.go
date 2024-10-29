@@ -3,9 +3,11 @@ package lib
 import (
 	"context"
 	"encoding/json"
-	"fmt"
+	"log/slog"
 
 	"github.com/pkg/errors"
+	"github.com/sisisin/gh-project-sync/lib/appcontext"
+	"github.com/sisisin/gh-project-sync/lib/logger"
 )
 
 func GetProjectDetailAll(
@@ -25,13 +27,16 @@ func GetProjectDetailAll(
 		return errors.Wrap(err, "failed to query GetProjectDetail")
 	}
 
-	fmt.Println("rateLimit:", projectDetail["rateLimit"])
+	if appcontext.GetVerbose(ctx) {
+		logger.Info(ctx, "rateLimit", slog.Any("body", projectDetail["rateLimit"]))
+	}
 
 	j, err := json.Marshal(projectDetail)
 	if err != nil {
 		return errors.Wrap(err, "failed to marshal projectDetail")
 	}
 
-	fmt.Println(string(j))
+	logger.Info(ctx, "response", slog.String("body", string(j)))
+
 	return nil
 }

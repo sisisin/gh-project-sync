@@ -6,10 +6,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"strings"
 
 	"github.com/pkg/errors"
+	"github.com/sisisin/gh-project-sync/lib/appcontext"
+	"github.com/sisisin/gh-project-sync/lib/logger"
 )
 
 //go:embed get_viewer.graphql
@@ -63,8 +66,8 @@ func (c *GitHubClient) GetProjectID(ctx context.Context, org string, projectNumb
 		return "", errors.Wrap(err, "failed to query GetProjectId")
 	}
 
-	if GetVerbose(ctx) {
-		fmt.Println("rateLimit", res.Data["rateLimit"])
+	if appcontext.GetVerbose(ctx) {
+		logger.Info(ctx, "rateLimit", slog.Any("body", res.Data["rateLimit"]))
 	}
 
 	ret, ok := res.Data["organization"].(map[string]any)["projectV2"].(map[string]any)["id"].(string)
@@ -79,7 +82,7 @@ func (c *GitHubClient) GetProjectDetail(ctx context.Context, id string) (map[str
 		"id":     id,
 		"first":  40,
 		"after":  nil,
-		"dryRun": GetDryRun(ctx),
+		"dryRun": appcontext.GetDryRun(ctx),
 	}
 
 	// todo: pagination

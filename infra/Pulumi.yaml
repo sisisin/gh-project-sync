@@ -1,0 +1,10 @@
+name: gh-project-sync-infra
+description: google cloud infra definition
+runtime:
+  name: nodejs
+  options:
+    packagemanager: pnpm
+config:
+  pulumi:tags:
+    value:
+      pulumi:template: gcp-typescript
