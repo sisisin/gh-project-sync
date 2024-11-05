@@ -33,6 +33,7 @@ func init() {
 		panic("GITHUB_ORG is not set")
 	}
 
+	// TODO: get from flag
 	projectNumberStr := os.Getenv("GITHUB_PROJECT_NUMBER")
 	if projectNumberStr == "" {
 		panic("GITHUB_PROJECT_NUMBER is not set")

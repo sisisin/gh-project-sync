@@ -18,7 +18,6 @@ func SyncProject(
 	org string,
 	projectNumber int,
 ) error {
-
 	if err := WriteToGcs(ctx); err != nil {
 		return errors.Wrap(err, "failed to write to GCS")
 	}
@@ -41,12 +40,6 @@ func LoadToBigQuery(ctx context.Context) error {
 		return errors.Wrap(err, "failed to delete")
 	}
 	if err := table.Load(ctx, "gs://github-project-sync/test1.ndjson", "2024103116"); err != nil {
-		return errors.Wrap(err, "failed to load")
-	}
-	if err := table.DeleteByProjectNumber(ctx, "2024-10-31T17:00:00", 10); err != nil {
-		return errors.Wrap(err, "failed to delete")
-	}
-	if err := table.Load(ctx, "gs://github-project-sync/test3.ndjson", "2024103117"); err != nil {
 		return errors.Wrap(err, "failed to load")
 	}
 

@@ -21,6 +21,7 @@ export function apply() {
   applyIAMMember(saCloudSchedulerForKickGhpsync, cloudSchedulerRoles);
 
   const runName = 'github-project-sync';
+  // TODO: create scheduler for each project ids and override run args
   new gcp.cloudscheduler.Job('kick-ghpsync', {
     // every hours at minute 5
     schedule: '5 * * * *',
