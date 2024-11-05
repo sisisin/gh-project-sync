@@ -59,6 +59,9 @@ func Error(ctx context.Context, msg string, args ...any) {
 func Info(ctx context.Context, msg string, args ...any) {
 	slog.InfoContext(ctx, msg, args...)
 }
+func Infof(ctx context.Context, format string, args ...any) {
+	slog.InfoContext(ctx, fmt.Sprintf(format, args...))
+}
 
 func Warn(ctx context.Context, msg string, args ...any) {
 	slog.WarnContext(ctx, msg, args...)

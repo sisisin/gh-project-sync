@@ -1,4 +1,4 @@
-query GetProjectDetail($dryRun: Boolean! = false, $id: ID!, $first: Int!, $cursor: String) {
+query GetProjectDetail($dryRun: Boolean! = false, $org: String!, $projectNumber: Int!, $first: Int!, $cursor: String) {
   rateLimit(dryRun: $dryRun) {
     cost
     limit
@@ -7,39 +7,40 @@ query GetProjectDetail($dryRun: Boolean! = false, $id: ID!, $first: Int!, $curso
     resetAt
     used
   }
-  node(id: $id) {
-    ... on ProjectV2 {
+  organization(login: $org) {
+    id
+    name
+    login
+    projectV2(number: $projectNumber) {
+      id
+      number
       items(first: $first, after: $cursor) {
-        edges {
-          node {
-            content {
-              ... on Issue {
-                title
-                assignees(first: 100) {
-                  nodes {
-                    login
-                  }
-                }
-              }
-              ... on DraftIssue {
-                title
-              }
-              ... on PullRequest {
-                title
-              }
+        pageInfo {
+          hasNextPage
+          endCursor
+        }
+        nodes {
+          content {
+            __typename
+            ... on Issue {
+              title
             }
-            createdAt
-            updatedAt
-            creator {
-              login
+            ... on DraftIssue {
+              title
             }
-            fieldValues(first: 100) {
-              totalCount
-              edges {
-                node {
-                  ...projectV2ItemFieldValue
-                }
-              }
+            ... on PullRequest {
+              title
+            }
+          }
+          createdAt
+          updatedAt
+          creator {
+            login
+          }
+          fieldValues(first: 100) {
+            totalCount
+            nodes {
+              ...projectV2ItemFieldValue
             }
           }
         }
@@ -50,6 +51,7 @@ query GetProjectDetail($dryRun: Boolean! = false, $id: ID!, $first: Int!, $curso
 }
 
 fragment projectV2ItemFieldValue on ProjectV2ItemFieldValue {
+  __typename
   ... on ProjectV2ItemFieldDateValue {
     date
     field {
@@ -159,6 +161,7 @@ fragment projectV2ItemFieldValue on ProjectV2ItemFieldValue {
 }
 
 fragment fieldName on ProjectV2FieldConfiguration {
+  __typename
   ... on ProjectV2Field {
     name
   }

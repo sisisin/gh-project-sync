@@ -74,20 +74,12 @@ func main() {
 
 	logger.Info(ctx, "start")
 
-	if err := run(ctx); err != nil {
+	graphqlClient := lib.NewGithubClient(token)
+
+	if err := lib.SyncProject(ctx, graphqlClient, org, ghProjectNumber); err != nil {
 		logger.Error(ctx, "failed to run", slog.Any("error", err))
 		os.Exit(1)
 	}
 
 	logger.Info(ctx, "end")
-}
-
-func run(ctx context.Context) error {
-	graphqlClient := lib.NewGithubClient(token)
-
-	err := lib.GetProjectDetailAll(ctx, graphqlClient, org, ghProjectNumber)
-	if err != nil {
-		return err
-	}
-	return nil
 }
