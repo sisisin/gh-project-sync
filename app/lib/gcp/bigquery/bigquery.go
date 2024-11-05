@@ -3,6 +3,7 @@ package bigquery
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"cloud.google.com/go/bigquery"
 	"github.com/pkg/errors"
@@ -31,12 +32,12 @@ func New(ctx context.Context, datasetID, tableID string) (*ProjectItemsTable, er
 	}, nil
 }
 
-func (t *ProjectItemsTable) DeleteByProjectNumber(ctx context.Context, partitionTime string, projectNumber int) error {
+func (t *ProjectItemsTable) DeleteByProjectNumber(ctx context.Context, partitionTime time.Time, projectNumber int) error {
 	query := fmt.Sprintf(
 		"DELETE FROM `%s.%s.%s` "+
 			"WHERE TIMESTAMP_TRUNC(_PARTITIONTIME, HOUR) = TIMESTAMP_TRUNC(\"%s\", HOUR) "+
 			"AND project_number = %d",
-		appcontext.GetProjectID(ctx), t.datasetID, t.tableID, partitionTime, projectNumber)
+		appcontext.GetProjectID(ctx), t.datasetID, t.tableID, partitionTime.Format(time.RFC3339), projectNumber)
 	q := t.client.Query(query)
 	job, err := q.Run(ctx)
 	if err != nil {
@@ -56,10 +57,10 @@ func (t *ProjectItemsTable) DeleteByProjectNumber(ctx context.Context, partition
 	return nil
 }
 
-func (t *ProjectItemsTable) Load(ctx context.Context, loadTargetUri string, partition string) error {
+func (t *ProjectItemsTable) Load(ctx context.Context, loadTargetUri string, partitionTime time.Time) error {
 	gcsRef := bigquery.NewGCSReference(loadTargetUri)
 	gcsRef.SourceFormat = bigquery.JSON
-
+	partition := partitionTime.Format("2006010215")
 	loader := t.client.Dataset(t.datasetID).Table(fmt.Sprintf("%s$%s", t.tableID, partition)).LoaderFrom(gcsRef)
 	loader.CreateDisposition = bigquery.CreateNever
 	loader.WriteDisposition = bigquery.WriteAppend

@@ -20,7 +20,7 @@ spec:
                   value: 'knowledge-work'
               command:
                 - '/bin/ghpsync'
-              image: sisisin/gh-project-sync:20241029-172238
+              image: sisisin/gh-project-sync:20241105-214844
               resources:
                 limits:
                   cpu: 1000m

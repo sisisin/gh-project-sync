@@ -62,13 +62,15 @@ export function apply() {
       'Table for GitHub Project Items. GitHub API v4を非正規化したレコードを入れます。itemsの最新の情報は最新のパーティションを参照して取得できます',
 
     schema: JSON.stringify([
-      { name: 'organization_id', type: 'STRING', mode: 'REQUIRED', description: 'GitHub API - Organization.id value' },
+      {
+        name: 'organization_login',
+        type: 'STRING',
+        mode: 'REQUIRED',
+        description: 'GitHub API - Organization.login value',
+      },
       { name: 'project_number', type: 'INT64', mode: 'REQUIRED', description: 'GitHub API - ProjectV2.number value' },
       { name: 'project_title', type: 'STRING', description: 'GitHub API - ProjectV2.name value' },
       { name: 'item', type: 'JSON', description: 'GitHub API ProjectV2Item.items.nodes value' },
-      { name: 'created_at', type: 'TIMESTAMP', description: 'GitHub API - ProjectV2Item.createdAt value' },
-      { name: 'updated_at', type: 'TIMESTAMP', description: 'GitHub API - ProjectV2Item.updatedAt value' },
-      { name: 'creator', type: 'STRING', description: 'GitHub API - ProjectV2Item.creator.login value' },
     ]),
   });
   const ghSyncBigQueryTableUserRole = new gcp.projects.IAMCustomRole('gh-sync-bigquery-user', {

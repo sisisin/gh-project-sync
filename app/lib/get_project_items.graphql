@@ -1,4 +1,4 @@
-query GetProjectDetail($dryRun: Boolean! = false, $org: String!, $projectNumber: Int!, $first: Int!, $cursor: String) {
+query GetProjectItems($id: ID!, $dryRun: Boolean! = false, $first: Int!, $after: String) {
   rateLimit(dryRun: $dryRun) {
     cost
     limit
@@ -7,14 +7,9 @@ query GetProjectDetail($dryRun: Boolean! = false, $org: String!, $projectNumber:
     resetAt
     used
   }
-  organization(login: $org) {
-    id
-    name
-    login
-    projectV2(number: $projectNumber) {
-      id
-      number
-      items(first: $first, after: $cursor) {
+  node(id: $id) {
+    ... on ProjectV2 {
+      items(first: $first, after: $after) {
         pageInfo {
           hasNextPage
           endCursor
@@ -37,7 +32,9 @@ query GetProjectDetail($dryRun: Boolean! = false, $org: String!, $projectNumber:
           creator {
             login
           }
-          fieldValues(first: 100) {
+          # NOTE: custom fields は25個まで対応
+          # rate limit的に上限取ってくるのはキツい
+          fieldValues(first: 25) {
             totalCount
             nodes {
               ...projectV2ItemFieldValue

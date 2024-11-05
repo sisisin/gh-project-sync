@@ -1,4 +1,4 @@
-query GetProjectId($dryRun: Boolean! = false, $org: String!, $projectNumber: Int!) {
+query GetProjectSummary($dryRun: Boolean! = false, $org: String!, $projectNumber: Int!) {
   rateLimit(dryRun: $dryRun) {
     cost
     limit
@@ -8,8 +8,13 @@ query GetProjectId($dryRun: Boolean! = false, $org: String!, $projectNumber: Int
     used
   }
   organization(login: $org) {
+    id
+    name
+    login
     projectV2(number: $projectNumber) {
       id
+      number
+      title
     }
   }
 }
