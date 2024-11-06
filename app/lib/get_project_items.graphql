@@ -18,13 +18,24 @@ query GetProjectItems($id: ID!, $dryRun: Boolean! = false, $first: Int!, $after:
           content {
             __typename
             ... on Issue {
+              number
               title
+              author {
+                login
+              }
             }
             ... on DraftIssue {
+              id
               title
+              creator {
+                login
+              }
             }
             ... on PullRequest {
               title
+              author {
+                login
+              }
             }
           }
           createdAt
