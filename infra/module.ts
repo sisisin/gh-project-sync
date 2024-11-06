@@ -39,6 +39,7 @@ export function apply() {
   const githubProjectSyncBucket = new gcp.storage.Bucket('github-project-sync', {
     location: 'us-west1',
     name: 'github-project-sync',
+    lifecycleRules: [{ action: { type: 'Delete' }, condition: { age: 7 } }],
   });
   applyBucketIAMMember(githubProjectSyncBucket, saCloudRunGhpsync, ['roles/storage.objectUser']);
 
