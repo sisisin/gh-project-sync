@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"time"
 
 	"github.com/pkg/errors"
@@ -74,8 +75,12 @@ func GetAndWriteToGcs(ctx context.Context,
 		return errors.Wrap(err, "failed to GetProjectSummary")
 	}
 
-	cursor := ""
-	gotItems := 0
+	var (
+		rateLimit  map[string]any
+		totalCount int
+		cursor     string
+		gotItems   int
+	)
 	for {
 		logger.Infof(ctx, "processing by project items %d - %d", gotItems, gotItems+100)
 		items, err := graphqlClient.GetProjectItems(ctx, projectSummary.Organization.ProjectV2.Id, cursor)
@@ -95,10 +100,18 @@ func GetAndWriteToGcs(ctx context.Context,
 		if items.Node.Items.PageInfo.HasNextPage {
 			cursor = items.Node.Items.PageInfo.EndCursor
 		} else {
+			rateLimit = items.RateLimit
+			totalCount = items.Node.Items.TotalCount
 			break
 		}
 	}
-	fmt.Printf("item len:%d, cursor: %s\n", gotItems, cursor)
+
+	// TODO: log rateLimit's cost for all requests
+	logger.Info(ctx, "end get project info and writing to GCS",
+		slog.Any("rateLimit", rateLimit),
+		slog.Any("gotItems", gotItems),
+		slog.Any("totalCount", totalCount),
+	)
 
 	if err := objectWriter.Close(); err != nil {
 		return errors.Wrap(err, "failed to close object")
