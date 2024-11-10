@@ -41,7 +41,7 @@ export function apply() {
   applyIAMMember(saCloudSchedulerForKickGhpsync, cloudSchedulerRoles);
 
   const runName = 'github-project-sync';
-  // TODO: create scheduler for each project ids and override run args
+
   new gcp.cloudscheduler.Job('kick-ghpsync', {
     // every hours at minute 5
     schedule: '5 * * * *',
@@ -58,7 +58,7 @@ export function apply() {
 
   const githubProjectSyncBucket = new gcp.storage.Bucket('github-project-sync', {
     location: 'us-west1',
-    name: 'github-project-sync',
+    name: `github-project-sync-${project}`,
     lifecycleRules: [{ action: { type: 'Delete' }, condition: { age: 7 } }],
   });
   applyBucketIAMMember(githubProjectSyncBucket, saCloudRunGhpsync, ['roles/storage.objectUser']);

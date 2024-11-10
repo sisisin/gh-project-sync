@@ -42,7 +42,7 @@ func LoadToBigQuery(ctx context.Context, now time.Time, projectNumber int) error
 		return errors.Wrap(err, "failed to delete")
 	}
 	// todo: fix hardcoded bucket name
-	loadTarget := "gs://github-project-sync/" + getOutFilePathFromNow(now)
+	loadTarget := "gs://github-project-sync-knowledgework-simenyan-sandbox/" + getOutFilePathFromNow(now)
 	if err := table.Load(ctx, loadTarget, now); err != nil {
 		return errors.Wrap(err, "failed to load")
 	}
@@ -63,7 +63,7 @@ func GetAndWriteToGcs(ctx context.Context,
 ) error {
 	logger.Info(ctx, "start get project info and writing to GCS")
 
-	appStorage, err := storage.New(ctx, "github-project-sync")
+	appStorage, err := storage.New(ctx, "github-project-sync-knowledgework-simenyan-sandbox")
 	if err != nil {
 		return errors.Wrap(err, "failed to create storage")
 	}
