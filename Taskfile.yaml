@@ -1,6 +1,11 @@
 version: '3'
 
 tasks:
+  scripts:init:
+    dir: ./scripts
+    cmds:
+      - go run ./cmd/init {{.CLI_ARGS}}
+
   infra:pulumi:up:
     dir: ./infra
     cmds:
