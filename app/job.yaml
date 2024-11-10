@@ -20,7 +20,7 @@ spec:
                   value: 'knowledge-work'
               command:
                 - '/bin/ghpsync'
-              image: sisisin/gh-project-sync:20241106-111516
+              image: us-west1-docker.pkg.dev/knowledgework-simenyan-sandbox/github-project-sync/app:20241109-190153
               resources:
                 limits:
                   cpu: 1000m

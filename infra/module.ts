@@ -6,6 +6,23 @@ const region = gcpConfig.require('region');
 const projectNumber = new pulumi.Config().requireNumber('projectNumber');
 
 export function apply() {
+  const registry = new gcp.artifactregistry.Repository('github-project-sync', {
+    repositoryId: 'github-project-sync',
+    format: 'DOCKER',
+    mode: 'STANDARD_REPOSITORY',
+    location: region,
+    cleanupPolicies: [
+      {
+        id: 'app-delete-old-images',
+        action: 'KEEP',
+        mostRecentVersions: {
+          keepCount: 3,
+          packageNamePrefixes: ['app'],
+        },
+      },
+    ],
+  });
+
   const saCloudRunGhpsync = new gcp.serviceaccount.Account('sa-cloud-run-ghpsync', {
     accountId: 'sa-cloud-run-ghpsync',
     displayName: 'Service Account for Cloud Run ghpsync',
@@ -110,6 +127,7 @@ export function apply() {
     outputs: {
       saEmail: saCloudRunGhpsync.email,
       bucketName: githubProjectSyncBucket.name,
+      registry: registry.repositoryId,
     },
   };
 }

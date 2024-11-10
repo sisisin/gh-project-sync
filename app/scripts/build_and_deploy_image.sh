@@ -7,16 +7,16 @@ readonly work_dir
 
 cd "$work_dir/.."
 
-TIMESTAMP=$(TZ=JST-9 date "+%Y%m%d-%H%M%S")
-IMAGE_ID=sisisin/gh-project-sync:$TIMESTAMP
+ts=$(TZ=JST-9 date "+%Y%m%d-%H%M%S")
+image_id=us-west1-docker.pkg.dev/${PROJECT_ID}/github-project-sync/app:$ts
 
-docker build --platform linux/amd64 -t "$IMAGE_ID" .
-docker login
-docker push "$IMAGE_ID"
+docker build --platform linux/amd64 -t "$image_id" .
+gcloud auth configure-docker us-west1-docker.pkg.dev
+docker push "$image_id"
 
 echo "Done."
-echo "$IMAGE_ID"
+echo "$image_id"
 
-sed -i '' "s|image: .*|image: $IMAGE_ID|" job.yaml
+sed -i '' "s|image: .*|image: $image_id|" job.yaml
 
 gcloud run jobs replace job.yaml
