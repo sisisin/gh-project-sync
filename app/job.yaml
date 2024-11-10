@@ -5,6 +5,7 @@ metadata:
 spec:
   template:
     spec:
+      taskCount: 2
       template:
         spec:
           containers:
@@ -14,7 +15,7 @@ spec:
                     secretKeyRef:
                       key: '1'
                       name: github-project-sync-github-token
-              image: us-west1-docker.pkg.dev/knowledgework-simenyan-sandbox/github-project-sync/app:20241110-204104
+              image: us-west1-docker.pkg.dev/knowledgework-simenyan-sandbox/github-project-sync/app:20241110-212227
               resources:
                 limits:
                   cpu: 1000m
