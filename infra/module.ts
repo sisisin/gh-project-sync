@@ -40,7 +40,7 @@ export function apply() {
   const cloudSchedulerRoles = ['roles/run.invoker'];
   applyIAMMember(saCloudSchedulerForKickGhpsync, cloudSchedulerRoles);
 
-  const runName = 'github-project-sync';
+  const runName = 'github-project-sync-run';
 
   new gcp.cloudscheduler.Job('kick-ghpsync', {
     // every hours at minute 5
@@ -132,6 +132,7 @@ export function apply() {
       bucketName: githubProjectSyncBucket.name,
       imageName,
       registryDomain,
+      runName,
     },
   };
 }

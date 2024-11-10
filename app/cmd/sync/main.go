@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"cloud.google.com/go/compute/metadata"
@@ -18,8 +19,9 @@ import (
 var isLocal = os.Getenv("IS_LOCAL") == "true"
 var token string = os.Getenv("GITHUB_TOKEN")
 var org string = os.Getenv("GITHUB_ORG")
-var ghProjectNumber int
+var ghProjectNumbers []int
 var projectIDFromEnv string = os.Getenv("PROJECT_ID")
+var cloudRunTaskIndex int
 
 var dryRun *bool
 var verbose *bool
@@ -33,15 +35,31 @@ func init() {
 		panic("GITHUB_ORG is not set")
 	}
 
-	// TODO: get from flag
-	projectNumberStr := os.Getenv("GITHUB_PROJECT_NUMBER")
-	if projectNumberStr == "" {
-		panic("GITHUB_PROJECT_NUMBER is not set")
+	{
+		projectNumberStr := os.Getenv("GITHUB_PROJECT_NUMBERS")
+		if projectNumberStr == "" {
+			panic("GITHUB_PROJECT_NUMBER is not set")
+		}
+		for _, str := range strings.Split(projectNumberStr, ",") {
+			num, err := strconv.Atoi(str)
+			if err != nil {
+				panic(err)
+			}
+			ghProjectNumbers = append(ghProjectNumbers, num)
+		}
 	}
-	var err error
-	ghProjectNumber, err = strconv.Atoi(projectNumberStr)
-	if err != nil {
-		panic(err)
+
+	{
+		iStr := os.Getenv("CLOUD_RUN_TASK_INDEX")
+		if !isLocal && iStr == "" {
+			panic("CLOUD_RUN_TASK_INDEX is not set")
+		}
+		var err error
+		cloudRunTaskIndex, err = strconv.Atoi(iStr)
+		if err != nil && !isLocal {
+			panic(err)
+		}
+
 	}
 
 	if !isLocal && projectIDFromEnv != "" {
@@ -77,7 +95,15 @@ func main() {
 
 	graphqlClient := lib.NewGithubClient(token)
 
-	if err := lib.SyncProject(ctx, graphqlClient, org, ghProjectNumber); err != nil {
+	var targetProjectNumber int
+	if isLocal {
+		logger.Infof(ctx, "local mode run. target project number is the first one: %d", ghProjectNumbers[0])
+		targetProjectNumber = ghProjectNumbers[0]
+	} else {
+		logger.Infof(ctx, "target project number is %d", ghProjectNumbers[cloudRunTaskIndex])
+		targetProjectNumber = ghProjectNumbers[cloudRunTaskIndex]
+	}
+	if err := lib.SyncProject(ctx, graphqlClient, org, targetProjectNumber); err != nil {
 		logger.Error(ctx, "failed to run", slog.Any("error", err))
 		os.Exit(1)
 	}

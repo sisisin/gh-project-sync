@@ -23,6 +23,8 @@ tasks:
     dir: ./app
     cmds:
       - go run ./cmd/sync {{.CLI_ARGS}}
+    dotenv:
+      - cmd/sync/.env
   app:sync:build:
     dir: ./app
     cmds:
