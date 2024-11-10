@@ -2,16 +2,18 @@
 
 set -ef -o pipefail
 
-work_dir=$(cd "$(dirname "$0")" && pwd)
-readonly work_dir
+script_dir=$(cd "$(dirname "$0")" && pwd)
+readonly script_dir
 
-cd "$work_dir/.."
+cd "$script_dir/.."
 
 ts=$(TZ=JST-9 date "+%Y%m%d-%H%M%S")
-image_id=us-west1-docker.pkg.dev/${PROJECT_ID}/github-project-sync/app:$ts
+image_name=$(pulumi --cwd="${script_dir}/../../infra" stack output imageName)
+registry_domain=$(pulumi --cwd="${script_dir}/../../infra" stack output registryDomain)
+image_id=${image_name}:$ts
 
 docker build --platform linux/amd64 -t "$image_id" .
-gcloud auth configure-docker us-west1-docker.pkg.dev
+gcloud auth configure-docker "${registry_domain}"
 docker push "$image_id"
 
 echo "Done."

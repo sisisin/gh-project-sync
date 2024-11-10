@@ -2,4 +2,8 @@
 
 set -eu -o pipefail
 
-gcloud run jobs execute github-project-sync --region=us-west1 --args="-verbose"
+script_dir=$(cd "$(dirname "$0")" && pwd)
+readonly script_dir
+
+region=$(pulumi --cwd="${script_dir}/../../infra" stack output region)
+gcloud run jobs execute github-project-sync --region="${region}" --args="-verbose"
