@@ -14,13 +14,7 @@ spec:
                     secretKeyRef:
                       key: '1'
                       name: github-project-sync-github-token
-                - name: GITHUB_PROJECT_NUMBER
-                  value: '9'
-                - name: GITHUB_ORG
-                  value: 'knowledge-work'
-              command:
-                - '/bin/ghpsync'
-              image: us-west1-docker.pkg.dev/knowledgework-simenyan-sandbox/github-project-sync/app:20241110-095421
+              image: us-west1-docker.pkg.dev/knowledgework-simenyan-sandbox/github-project-sync/app:20241110-204104
               resources:
                 limits:
                   cpu: 1000m

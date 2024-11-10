@@ -18,9 +18,13 @@ RUN --mount=type=cache,target=/go/pkg/mod/ \
 
 FROM debian:bookworm-slim AS final
 
+WORKDIR /app
+
 ARG UID=10001
 
-RUN apt-get update && apt-get install -y ca-certificates openssl
+RUN apt-get update && apt-get install -y ca-certificates openssl curl \
+  && curl -sfS https://dotenvx.sh/install.sh | sh
+
 RUN adduser \
   --disabled-password \
   --gecos "" \
@@ -31,8 +35,9 @@ RUN adduser \
   appuser
 USER appuser
 
-COPY --from=builder /bin/ghpsync /bin/
+COPY --from=builder /bin/ghpsync .
+COPY ./cmd/sync/.env .
 
 EXPOSE 8080
-ENTRYPOINT [ "/bin/sync" ]
-CMD [ "./bin/ghpsync" ]
+ENTRYPOINT [ "dotenvx", "run", "--env-file=/app/.env", "--"]
+CMD [ "/app/ghpsync" ]
