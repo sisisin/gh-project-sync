@@ -1,7 +1,7 @@
 apiVersion: run.googleapis.com/v1
 kind: Job
 metadata:
-  name: github-project-sync
+  name: github-project-sync-run
 spec:
   template:
     spec:
