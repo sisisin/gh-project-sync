@@ -1,11 +1,24 @@
 version: '3'
 
 tasks:
-  sync:run:
+  infra:pulumi:up:
+    dir: ./infra
+    cmds:
+      - pulumi up
+
+  app:deploy:
+    dir: ./app
+    cmds:
+      - ./scripts/build_and_deploy_image.sh
+  app:kick-job:
+    dir: ./app
+    cmds:
+      - ./scripts/kick_ghpsync_job.sh
+  app:sync:run:
     dir: ./app
     cmds:
       - go run ./cmd/sync {{.CLI_ARGS}}
-  sync:build:
+  app:sync:build:
     dir: ./app
     cmds:
       - go build -o ./bin/sync ./cmd/sync
