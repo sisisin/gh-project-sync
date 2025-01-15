@@ -42,7 +42,7 @@ func LoadToBigQuery(ctx context.Context, now time.Time, projectNumber int) error
 		return errors.Wrap(err, "failed to delete")
 	}
 	// todo: fix hardcoded bucket name
-	loadTarget := "gs://github-project-sync-knowledgework-simenyan-sandbox/" + getOutFilePathFromNow(now)
+	loadTarget := "gs://github-project-sync-knowledgework-simenyan-sandbox/" + getOutFilePathFromNow(now, projectNumber)
 	if err := table.Load(ctx, loadTarget, now); err != nil {
 		return errors.Wrap(err, "failed to load")
 	}
@@ -51,8 +51,8 @@ func LoadToBigQuery(ctx context.Context, now time.Time, projectNumber int) error
 	return nil
 }
 
-func getOutFilePathFromNow(now time.Time) string {
-	return now.Format("2006-01-02/1504") + "-out.ndjson"
+func getOutFilePathFromNow(now time.Time, projectNumber int) string {
+	return now.Format("2006-01-02/1504") + fmt.Sprintf("-project_%d-out.ndjson", projectNumber)
 }
 
 func GetAndWriteToGcs(ctx context.Context,
@@ -67,7 +67,7 @@ func GetAndWriteToGcs(ctx context.Context,
 	if err != nil {
 		return errors.Wrap(err, "failed to create storage")
 	}
-	objectWriter := appStorage.GetObjectWriter(ctx, getOutFilePathFromNow(now))
+	objectWriter := appStorage.GetObjectWriter(ctx, getOutFilePathFromNow(now, projectNumber))
 	objectWriter.ContentType = "application/x-ndjson"
 
 	projectSummary, err := graphqlClient.GetProjectSummary(ctx, org, projectNumber)
