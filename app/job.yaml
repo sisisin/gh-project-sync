@@ -15,7 +15,7 @@ spec:
                     secretKeyRef:
                       key: '2'
                       name: github-project-sync-github-token
-              image: us-west1-docker.pkg.dev/knowledgework-simenyan-sandbox/github-project-sync/app:20250115-172601
+              image: us-west1-docker.pkg.dev/knowledgework-simenyan-sandbox/github-project-sync/app:20250410-111007
               resources:
                 limits:
                   cpu: 1000m
