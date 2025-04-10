@@ -19,7 +19,7 @@ func (h *LogHandler) Handle(ctx context.Context, r slog.Record) error {
 	if val := appcontext.GetTraceID(ctx); val != "" {
 		projectID := appcontext.GetProjectID(ctx)
 		key := fmt.Sprintf("projects/%s/traces/%s", projectID, val)
-		r.AddAttrs(slog.Attr{Key: "trace", Value: slog.StringValue(key)})
+		r.AddAttrs(slog.Attr{Key: "logging.googleapis.com/trace", Value: slog.StringValue(key)})
 	}
 
 	return h.Handler.Handle(ctx, r)
