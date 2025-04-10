@@ -5,7 +5,7 @@ metadata:
 spec:
   template:
     spec:
-      taskCount: 2
+      taskCount: 3
       template:
         spec:
           containers:
