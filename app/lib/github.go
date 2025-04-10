@@ -55,7 +55,7 @@ func (c *GitHubClient) GetViewer(ctx context.Context) (map[string]any, error) {
 }
 
 type GitHubProjectSummary struct {
-	RateLimit    map[string]any `json:"rateLimit"`
+	RateLimit    RateLimit `json:"rateLimit"`
 	Organization struct {
 		Id        string `json:"id"`
 		Name      string `json:"name"`
@@ -87,8 +87,17 @@ func (c *GitHubClient) GetProjectSummary(ctx context.Context, org string, projec
 	return &res.Data, nil
 }
 
+type RateLimit struct {
+	Cost      int    `json:"cost"`
+	Limit     int    `json:"limit"`
+	NodeCount int    `json:"nodeCount"`
+	Remaining int    `json:"remaining"`
+	ResetAt   string `json:"resetAt"`
+	Used      int    `json:"used"`
+}
+
 type GitHubProjectItems struct {
-	RateLimit map[string]any `json:"rateLimit"`
+	RateLimit RateLimit `json:"rateLimit"`
 	Node      struct {
 		Items struct {
 			PageInfo struct {

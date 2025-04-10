@@ -70,17 +70,20 @@ func GetAndWriteToGcs(ctx context.Context,
 	objectWriter := appStorage.GetObjectWriter(ctx, getOutFilePathFromNow(now, projectNumber))
 	objectWriter.ContentType = "application/x-ndjson"
 
+	var (
+		rateLimit  RateLimit
+		totalCount int
+		totalCost  int
+		cursor     string
+		gotItems   int
+	)
+
 	projectSummary, err := graphqlClient.GetProjectSummary(ctx, org, projectNumber)
 	if err != nil {
 		return errors.Wrap(err, "failed to GetProjectSummary")
 	}
+	totalCost += projectSummary.RateLimit.Cost
 
-	var (
-		rateLimit  map[string]any
-		totalCount int
-		cursor     string
-		gotItems   int
-	)
 	for {
 		logger.Infof(ctx, "processing by project items %d - %d", gotItems, gotItems+100)
 		items, err := graphqlClient.GetProjectItems(ctx, projectSummary.Organization.ProjectV2.Id, cursor)
@@ -88,6 +91,7 @@ func GetAndWriteToGcs(ctx context.Context,
 			return errors.Wrap(err, "failed to get project items")
 		}
 		gotItems += len(items.Node.Items.Nodes)
+		totalCost += items.RateLimit.Cost
 
 		jsonLines, err := toJsonLines(projectSummary, items, items.Node.Items.PageInfo.HasNextPage)
 		if err != nil {
@@ -106,8 +110,7 @@ func GetAndWriteToGcs(ctx context.Context,
 		}
 	}
 
-	// TODO: log rateLimit's cost for all requests
-	logger.Info(ctx, "end get project info and writing to GCS",
+	logger.Info(ctx, fmt.Sprintf("end get project info. total cost: %d, used: %d/%d, remain: %d", totalCost, rateLimit.Used, rateLimit.Limit, rateLimit.Remaining),
 		slog.Any("rateLimit", rateLimit),
 		slog.Any("gotItems", gotItems),
 		slog.Any("totalCount", totalCount),
